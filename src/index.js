@@ -1,12 +1,20 @@
 import express from "express";
-// import mysql from "mysql";
 import connectDB from "./db/connect.db.js";
 import { PORT } from "./utils/constants.js";
+import bodyParser from "body-parser";
 
 const app = express();
 
-// Define a route to fetch data from MySQL
+app.use(express.static("public"));
 
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+  res.sendFile("register.html", { root: "public" });
+});
+
+// Handle GET requests to retrieve data
 app.get("/data", async (req, res) => {
   try {
     const connection = await connectDB();
@@ -29,12 +37,11 @@ app.get("/data", async (req, res) => {
 
 const startServer = async () => {
   try {
-    await connectDB();
     app.listen(PORT, () => {
-      console.log(` ⚙️  Server is running at port : ${PORT}`);
+      console.log(`⚙️ Server is running at port: ${PORT}`);
     });
   } catch (err) {
-    console.log("connection error", err);
+    console.log("Connection error:", err);
   }
 };
 
