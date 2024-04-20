@@ -1,10 +1,10 @@
 import express from "express";
 import connectDB from "./db/connect.db.js";
-import { PORT } from "./utils/constants.js";
+import { PORT, STUDENT_TABLE } from "./utils/constants.js";
 import bodyParser from "body-parser";
 
 const app = express();
-
+const connection = await connectDB();
 app.use(express.static("public"));
 
 app.use(express.json());
@@ -14,13 +14,23 @@ app.get("/", (req, res) => {
   res.sendFile("register.html", { root: "public" });
 });
 
+app.post("/", (req, res) => {
+  // console.log(req.body);
+  const name = req.body.name;
+
+  connection.query(`INSERT INTO ${STUDENT_TABLE} (name) VALUES (?)`, [name]);
+
+  console.log(name);
+  res.send("Received your data!"); // Responding to the POST request
+});
+
 // Handle GET requests to retrieve data
 app.get("/data", async (req, res) => {
   try {
     const connection = await connectDB();
 
     // Use the connection to query the database
-    connection.query("SELECT * FROM student", (error, results) => {
+    connection.query(`SELECT * FROM ${STUDENT_TABLE} `, (error, results) => {
       // Release the connection
       connection.end();
 
